@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A股因子回测结果</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f6fa; color: #2d3436; }
+.header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; padding: 28px 32px; }
+.header h1 { font-size: 24px; font-weight: 600; }
+.header p { font-size: 13px; opacity: 0.7; margin-top: 6px; }
+.container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+.info { background: #fff; padding: 16px 20px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; color: #636e72; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+@media (max-width: 900px) { .chart-row { grid-template-columns: 1fr; } }
+.chart-box { background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.chart-box h3 { font-size: 14px; margin-bottom: 12px; }
+.chart { width: 100%; height: 420px; }
+.chart-full { width: 100%; height: 380px; }
+.table-box { background: #fff; padding: 16px 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 24px; overflow-x: auto; }
+.table-box h3 { font-size: 15px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { background: #f8f9fa; padding: 10px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #dee2e6; white-space: nowrap; }
+td { padding: 10px 12px; border-bottom: 1px solid #f1f3f4; }
+tr:hover { background: #f8f9ff; }
+.positive { color: #00b894; font-weight: 600; }
+.negative { color: #d63031; font-weight: 600; }
+.footer { text-align: center; padding: 20px; color: #b2bec3; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>A股因子回测结果</h1>
+  <p>回测区间：2024-01-01 ~ 2024-12-31 | 股票池：15只沪深龙头 | 调仓周期：20日 | Top 5持仓 | 初始资金100万</p>
+</div>
+
+<div class="container">
+
+  <div class="chart-row">
+    <div class="chart-box">
+      <h3>各因子总收益率对比</h3>
+      <div class="chart" id="chart-returns"></div>
+    </div>
+    <div class="chart-box">
+      <h3>各因子Sharpe &amp; 最大回撤</h3>
+      <div class="chart" id="chart-sharpe-dd"></div>
+    </div>
+  </div>
+
+  <div class="chart-box" style="margin-bottom:24px">
+    <h3>超额收益对比（vs 四大基准指数）</h3>
+    <div class="chart-full" id="chart-excess"></div>
+  </div>
+
+  <div class="table-box">
+    <h3>因子绩效汇总表</h3>
+    <table>
+      <thead><tr>
+        <th>因子</th><th>选股逻辑</th><th>总收益</th><th>年化收益</th>
+        <th>Sharpe</th><th>最大回撤</th><th>Calmar</th><th>胜率</th><th>交易数</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>动量_20日</strong></td>
+          <td>做多动量最强</td>
+          <td class="positive">16.08%</td>
+          <td>16.8%</td>
+          <td>1.157</td>
+          <td class="negative">-6.52%</td>
+          <td>2.578</td>
+          <td>55.56%</td>
+          <td>36</td>
+        </tr>
+        <tr>
+          <td><strong>量比_20日</strong></td>
+          <td>做多放量</td>
+          <td class="positive">19.04%</td>
+          <td>19.9%</td>
+          <td>1.014</td>
+          <td class="negative">-10.99%</td>
+          <td>1.811</td>
+          <td>61.11%</td>
+          <td>36</td>
+        </tr>
+        <tr>
+          <td><strong>RSI_14</strong></td>
+          <td>做多RSI高</td>
+          <td class="positive">20.62%</td>
+          <td>21.56%</td>
+          <td>1.247</td>
+          <td class="negative">-6.42%</td>
+          <td>3.356</td>
+          <td>67.65%</td>
+          <td>34</td>
+        </tr>
+        <tr>
+          <td><strong>波动率_20日</strong></td>
+          <td>做多低波动</td>
+          <td class="positive">14.7%</td>
+          <td>15.36%</td>
+          <td>0.994</td>
+          <td class="negative">-9.39%</td>
+          <td>1.636</td>
+          <td>70.0%</td>
+          <td>20</td>
+        </tr>
+        <tr>
+          <td><strong>均线偏离_20日</strong></td>
+          <td>做多偏离均线上方</td>
+          <td class="positive">23.28%</td>
+          <td>24.35%</td>
+          <td>1.352</td>
+          <td class="negative">-10.3%</td>
+          <td>2.364</td>
+          <td>67.74%</td>
+          <td>31</td>
+        </tr>
+        <tr>
+          <td><strong>价格位置_20日</strong></td>
+          <td>做多高位</td>
+          <td class="positive">19.46%</td>
+          <td>20.34%</td>
+          <td>1.536</td>
+          <td class="negative">-5.69%</td>
+          <td>3.576</td>
+          <td>65.62%</td>
+          <td>32</td>
+        </tr>
+        <tr>
+          <td><strong>振幅_20日</strong></td>
+          <td>做多低振幅</td>
+          <td class="positive">24.02%</td>
+          <td>25.13%</td>
+          <td>1.35</td>
+          <td class="negative">-10.36%</td>
+          <td>2.426</td>
+          <td>66.67%</td>
+          <td>15</td>
+        </tr>
+        <tr>
+          <td><strong>成交额_20日</strong></td>
+          <td>做多高成交额</td>
+          <td class="positive">38.48%</td>
+          <td>40.35%</td>
+          <td>1.16</td>
+          <td class="negative">-19.67%</td>
+          <td>2.052</td>
+          <td>71.43%</td>
+          <td>14</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="table-box">
+    <h3>超额收益对比表</h3>
+    <table>
+      <thead><tr>
+        <th>因子</th><th>vs 沪深300超额</th><th>vs 上证50超额</th>
+        <th>vs 中证500超额</th><th>vs 创业板超额</th><th>信息比率(vs HS300)</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>动量_20日</strong><br><small>做多动量最强</small></td>
+          <td class="negative">-0.12%</td>
+          <td class="negative">-1.05%</td>
+          <td class="positive">10.23%</td>
+          <td class="positive">0.69%</td>
+          <td>-0.112</td>
+        </tr>
+        <tr>
+          <td><strong>量比_20日</strong><br><small>做多放量</small></td>
+          <td class="positive">2.84%</td>
+          <td class="positive">1.91%</td>
+          <td class="positive">13.19%</td>
+          <td class="positive">3.64%</td>
+          <td>0.131</td>
+        </tr>
+        <tr>
+          <td><strong>RSI_14</strong><br><small>做多RSI高</small></td>
+          <td class="positive">4.42%</td>
+          <td class="positive">3.5%</td>
+          <td class="positive">19.37%</td>
+          <td class="positive">5.23%</td>
+          <td>0.211</td>
+        </tr>
+        <tr>
+          <td><strong>波动率_20日</strong><br><small>做多低波动</small></td>
+          <td class="negative">-1.5%</td>
+          <td class="negative">-2.42%</td>
+          <td class="positive">8.86%</td>
+          <td class="negative">-0.69%</td>
+          <td>-0.189</td>
+        </tr>
+        <tr>
+          <td><strong>均线偏离_20日</strong><br><small>做多偏离均线上方</small></td>
+          <td class="positive">7.08%</td>
+          <td class="positive">6.16%</td>
+          <td class="positive">17.44%</td>
+          <td class="positive">7.89%</td>
+          <td>0.379</td>
+        </tr>
+        <tr>
+          <td><strong>价格位置_20日</strong><br><small>做多高位</small></td>
+          <td class="positive">3.26%</td>
+          <td class="positive">2.34%</td>
+          <td class="positive">13.61%</td>
+          <td class="positive">4.07%</td>
+          <td>0.082</td>
+        </tr>
+        <tr>
+          <td><strong>振幅_20日</strong><br><small>做多低振幅</small></td>
+          <td class="positive">7.82%</td>
+          <td class="positive">6.9%</td>
+          <td class="positive">18.18%</td>
+          <td class="positive">8.63%</td>
+          <td>0.427</td>
+        </tr>
+        <tr>
+          <td><strong>成交额_20日</strong><br><small>做多高成交额</small></td>
+          <td class="positive">22.28%</td>
+          <td class="positive">21.35%</td>
+          <td class="positive">32.63%</td>
+          <td class="positive">23.09%</td>
+          <td>1.102</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+</div>
+
+<div class="footer">Generated by A-Share Quant System</div>
+
+<script>
+(function() {
+  const names = ["动量_20日", "量比_20日", "RSI_14", "波动率_20日", "均线偏离_20日", "价格位置_20日", "振幅_20日", "成交额_20日"];
+  const returns = [16.08, 19.04, 20.62, 14.7, 23.28, 19.46, 24.02, 38.48];
+  const sharpes = [1.157, 1.014, 1.247, 0.994, 1.352, 1.536, 1.35, 1.16];
+  const maxdds = [-6.52, -10.99, -6.42, -9.39, -10.3, -5.69, -10.36, -19.67];
+  const excessHS300 = [-0.12, 2.84, 4.42, -1.5, 7.08, 3.26, 7.82, 22.28];
+
+  const excessData = [{"name": "沪深300", "excess": -0.12}, {"name": "上证50", "excess": -1.05}, {"name": "中证500", "excess": 10.23}, {"name": "创业板指", "excess": 0.69}, {"name": "沪深300", "excess": 2.84}, {"name": "上证50", "excess": 1.91}, {"name": "中证500", "excess": 13.19}, {"name": "创业板指", "excess": 3.64}, {"name": "沪深300", "excess": 4.42}, {"name": "上证50", "excess": 3.5}, {"name": "中证500", "excess": 19.37}, {"name": "创业板指", "excess": 5.23}, {"name": "沪深300", "excess": -1.5}, {"name": "上证50", "excess": -2.42}, {"name": "中证500", "excess": 8.86}, {"name": "创业板指", "excess": -0.69}, {"name": "沪深300", "excess": 7.08}, {"name": "上证50", "excess": 6.16}, {"name": "中证500", "excess": 17.44}, {"name": "创业板指", "excess": 7.89}, {"name": "沪深300", "excess": 3.26}, {"name": "上证50", "excess": 2.34}, {"name": "中证500", "excess": 13.61}, {"name": "创业板指", "excess": 4.07}, {"name": "沪深300", "excess": 7.82}, {"name": "上证50", "excess": 6.9}, {"name": "中证500", "excess": 18.18}, {"name": "创业板指", "excess": 8.63}, {"name": "沪深300", "excess": 22.28}, {"name": "上证50", "excess": 21.35}, {"name": "中证500", "excess": 32.63}, {"name": "创业板指", "excess": 23.09}];
+
+  // Chart 1: Returns bar
+  const c1 = echarts.init(document.getElementById('chart-returns'));
+  c1.setOption({
+    tooltip: { trigger: 'axis', formatter: p => p[0].name + '<br/>总收益: <b>' + p[0].data + '%</b>' },
+    grid: { left: 120, right: 20, top: 10, bottom: 20 },
+    xAxis: { type: 'value', axisLabel: { formatter: v => v + '%' } },
+    yAxis: { type: 'category', data: names, inverse: true, axisLabel: { fontSize: 12 } },
+    series: [{
+      type: 'bar', data: returns.map((v, i) => ({ value: v, itemStyle: { color: v >= 0 ? '#00b894' : '#d63031' } })),
+      label: { show: true, position: 'right', formatter: p => p.value + '%', fontSize: 11 }
+    }]
+  });
+
+  // Chart 2: Sharpe + MaxDD
+  const c2 = echarts.init(document.getElementById('chart-sharpe-dd'));
+  c2.setOption({
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['Sharpe', '最大回撤%'], bottom: 0 },
+    grid: { left: 120, right: 60, top: 20, bottom: 40 },
+    xAxis: { type: 'category', data: names, axisLabel: { rotate: 30, fontSize: 11 } },
+    yAxis: [
+      { type: 'value', name: 'Sharpe', axisLabel: { fontSize: 11 } },
+      { type: 'value', name: '回撤%', axisLabel: { formatter: v => v + '%' }, inverse: true }
+    ],
+    series: [
+      { name: 'Sharpe', type: 'bar', data: sharpes,
+         itemStyle: { color: '#0984e3' }, label: { show: true, position: 'top', fontSize: 10 } },
+      { name: '最大回撤%', type: 'line', yAxisIndex: 1, data: maxdds,
+         itemStyle: { color: '#d63031' }, lineStyle: { width: 2 },
+         label: { show: true, position: 'top', fontSize: 10, formatter: p => p.value + '%' } }
+    ]
+  });
+
+  // Chart 3: Excess returns
+  const excessMap = {};
+  const benchmarkNamesSet = new Set();
+  const excessSeries = {
+    hs300: [],
+    sz50: [],
+    zz500: [],
+    cyb: []
+  };
+  [{"factor": "动量_20日", "bm": "hs300", "excess": -0.12}, {"factor": "动量_20日", "bm": "sz50", "excess": -1.05}, {"factor": "动量_20日", "bm": "zz500", "excess": 10.23}, {"factor": "动量_20日", "bm": "cyb", "excess": 0.69}, {"factor": "量比_20日", "bm": "hs300", "excess": 2.84}, {"factor": "量比_20日", "bm": "sz50", "excess": 1.91}, {"factor": "量比_20日", "bm": "zz500", "excess": 13.19}, {"factor": "量比_20日", "bm": "cyb", "excess": 3.64}, {"factor": "RSI_14", "bm": "hs300", "excess": 4.42}, {"factor": "RSI_14", "bm": "sz50", "excess": 3.5}, {"factor": "RSI_14", "bm": "zz500", "excess": 19.37}, {"factor": "RSI_14", "bm": "cyb", "excess": 5.23}, {"factor": "波动率_20日", "bm": "hs300", "excess": -1.5}, {"factor": "波动率_20日", "bm": "sz50", "excess": -2.42}, {"factor": "波动率_20日", "bm": "zz500", "excess": 8.86}, {"factor": "波动率_20日", "bm": "cyb", "excess": -0.69}, {"factor": "均线偏离_20日", "bm": "hs300", "excess": 7.08}, {"factor": "均线偏离_20日", "bm": "sz50", "excess": 6.16}, {"factor": "均线偏离_20日", "bm": "zz500", "excess": 17.44}, {"factor": "均线偏离_20日", "bm": "cyb", "excess": 7.89}, {"factor": "价格位置_20日", "bm": "hs300", "excess": 3.26}, {"factor": "价格位置_20日", "bm": "sz50", "excess": 2.34}, {"factor": "价格位置_20日", "bm": "zz500", "excess": 13.61}, {"factor": "价格位置_20日", "bm": "cyb", "excess": 4.07}, {"factor": "振幅_20日", "bm": "hs300", "excess": 7.82}, {"factor": "振幅_20日", "bm": "sz50", "excess": 6.9}, {"factor": "振幅_20日", "bm": "zz500", "excess": 18.18}, {"factor": "振幅_20日", "bm": "cyb", "excess": 8.63}, {"factor": "成交额_20日", "bm": "hs300", "excess": 22.28}, {"factor": "成交额_20日", "bm": "sz50", "excess": 21.35}, {"factor": "成交额_20日", "bm": "zz500", "excess": 32.63}, {"factor": "成交额_20日", "bm": "cyb", "excess": 23.09}].forEach(function(d) {
+    excessSeries[d.bm].push(d.excess);
+    benchmarkNamesSet.add(d.bm);
+  });
+  const bmKeys = ['hs300', 'sz50', 'zz500', 'cyb'];
+  const bmLabels = { hs300: 'vs 沪深300', sz50: 'vs 上证50', zz500: 'vs 中证500', cyb: 'vs 创业板指' };
+  const bmColors = ['#0984e3', '#e17055', '#00b894', '#6c5ce7'];
+
+  const c3 = echarts.init(document.getElementById('chart-excess'));
+  const series3 = bmKeys.filter(k => excessSeries[k] && excessSeries[k].length > 0).map((k, i) => ({
+    name: bmLabels[k], type: 'bar', data: excessSeries[k],
+    itemStyle: { color: bmColors[i] },
+    label: { show: true, position: 'top', fontSize: 10, formatter: p => p.value + '%' }
+  }));
+  c3.setOption({
+    tooltip: { trigger: 'axis' },
+    legend: { data: series3.map(s => s.name), bottom: 0 },
+    grid: { left: 120, right: 20, top: 20, bottom: 40 },
+    xAxis: { type: 'category', data: names, axisLabel: { rotate: 30, fontSize: 11 } },
+    yAxis: { type: 'value', axisLabel: { formatter: v => v + '%' } },
+    series: series3
+  });
+
+  window.addEventListener('resize', () => { c1.resize(); c2.resize(); c3.resize(); });
+})();
+</script>
+</body>
+</html>

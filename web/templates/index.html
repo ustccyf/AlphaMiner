@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A-Share Quant Backtest</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f6fa; color: #2d3436; }
+.header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; padding: 24px 32px; }
+.header h1 { font-size: 22px; font-weight: 600; }
+.header p { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+.container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 20px; }
+.control-group { display: flex; flex-direction: column; gap: 4px; }
+.control-group label { font-size: 12px; color: #636e72; font-weight: 500; }
+.control-group select, .control-group input { padding: 8px 12px; border: 1px solid #dfe6e9; border-radius: 6px; font-size: 13px; background: #fff; min-width: 100px; }
+.control-group select:focus, .control-group input:focus { outline: none; border-color: #0984e3; }
+.benchmark-checks { display: flex; gap: 12px; flex-wrap: wrap; }
+.benchmark-checks label { display: flex; align-items: center; gap: 4px; font-size: 13px; cursor: pointer; }
+.benchmark-checks input[type="checkbox"] { accent-color: #0984e3; }
+.btn { padding: 9px 24px; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: #0984e3; color: #fff; }
+.btn-primary:hover { background: #0767b3; }
+.btn-primary:disabled { background: #b2bec3; cursor: not-allowed; }
+.loading { text-align: center; padding: 40px; display: none; }
+.loading.active { display: block; }
+.spinner { width: 36px; height: 36px; border: 3px solid #dfe6e9; border-top-color: #0984e3; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.results { display: none; }
+.results.active { display: block; }
+.metrics { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.metric-card { background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.metric-card .label { font-size: 12px; color: #636e72; margin-bottom: 4px; }
+.metric-card .value { font-size: 20px; font-weight: 600; }
+.metric-card .value.positive { color: #00b894; }
+.metric-card .value.negative { color: #d63031; }
+.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+@media (max-width: 900px) { .chart-row { grid-template-columns: 1fr; } }
+.chart-box { background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.chart-box h3 { font-size: 14px; margin-bottom: 12px; color: #2d3436; }
+.chart { width: 100%; height: 420px; }
+.chart-full { width: 100%; height: 360px; }
+.benchmark-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.benchmark-table th { background: #f8f9fa; padding: 10px 12px; text-align: left; font-weight: 500; border-bottom: 2px solid #dee2e6; }
+.benchmark-table td { padding: 10px 12px; border-bottom: 1px solid #f1f3f4; }
+.benchmark-table .positive { color: #00b894; font-weight: 600; }
+.benchmark-table .negative { color: #d63031; font-weight: 600; }
+#error-msg { display: none; color: #d63031; background: #ffeaa7; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>A-Share Quantitative Backtesting System</h1>
+  <p>A股量化回测系统 — 事件驱动引擎 · 多基准对比 · 超额收益分析</p>
+</div>
+
+<div class="container">
+
+  <div class="controls">
+    <div class="control-group">
+      <label>策略</label>
+      <select id="strategy">
+        <option value="ma_crossover">均线交叉</option>
+        <option value="multi_factor">多因子选股</option>
+      </select>
+    </div>
+    <div class="control-group" id="ma-params">
+      <label>快线 / 慢线</label>
+      <div style="display:flex;gap:8px">
+        <input type="number" id="fast" value="5" min="2" max="120" style="width:70px">
+        <input type="number" id="slow" value="20" min="5" max="250" style="width:70px">
+      </div>
+    </div>
+    <div class="control-group">
+      <label>开始日期</label>
+      <input type="text" id="start-date" value="20240101" placeholder="YYYYMMDD" style="width:110px">
+    </div>
+    <div class="control-group">
+      <label>结束日期</label>
+      <input type="text" id="end-date" value="20241231" placeholder="YYYYMMDD" style="width:110px">
+    </div>
+    <div class="control-group">
+      <label>初始资金</label>
+      <input type="number" id="cash" value="1000000" min="10000" step="100000" style="width:120px">
+    </div>
+    <div class="control-group" style="flex:1;min-width:300px">
+      <label>股票代码（逗号分隔）</label>
+      <input type="text" id="symbols" value="600519.SH,000858.SZ,000333.SZ,601318.SH,600036.SH" placeholder="600519.SH,000858.SZ,...">
+    </div>
+    <div class="control-group">
+      <label>对比基准</label>
+      <div class="benchmark-checks">
+        <label><input type="checkbox" value="sh"> 上证指数</label>
+        <label><input type="checkbox" value="hs300" checked> 沪深300</label>
+        <label><input type="checkbox" value="sz50"> 上证50</label>
+        <label><input type="checkbox" value="zz500"> 中证500</label>
+        <label><input type="checkbox" value="zz1000"> 中证1000</label>
+        <label><input type="checkbox" value="cyb"> 创业板指</label>
+        <label><input type="checkbox" value="kc50"> 科创50</label>
+        <label><input type="checkbox" value="szcz"> 深证成指</label>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="run-btn" onclick="runBacktest()">运行回测</button>
+  </div>
+
+  <div id="error-msg"></div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>回测运行中，请稍候...</p>
+  </div>
+
+  <div class="results" id="results">
+    <div class="metrics" id="metrics-container"></div>
+
+    <div class="chart-row">
+      <div class="chart-box">
+        <h3>累计收益率对比</h3>
+        <div class="chart" id="chart-equity"></div>
+      </div>
+      <div class="chart-box">
+        <h3>回撤曲线</h3>
+        <div class="chart" id="chart-drawdown"></div>
+      </div>
+    </div>
+
+    <div class="chart-box" style="margin-bottom:20px">
+      <h3>基准超额收益对比</h3>
+      <div id="benchmark-comparison" style="overflow-x:auto"></div>
+    </div>
+
+    <div class="chart-box">
+      <h3>交易盈亏分布</h3>
+      <div class="chart-full" id="chart-trades"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const COLORS = ['#0984e3', '#e17055', '#00b894', '#6c5ce7', '#fdcb6e', '#e84393'];
+
+function runBacktest() {
+  const benchmarks = [];
+  document.querySelectorAll('.benchmark-checks input:checked').forEach(cb => benchmarks.push(cb.value));
+  if (benchmarks.length === 0) { showError('请至少选择一个对比基准'); return; }
+
+  document.getElementById('error-msg').style.display = 'none';
+  document.getElementById('loading').classList.add('active');
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('run-btn').disabled = true;
+
+  const payload = {
+    strategy: document.getElementById('strategy').value,
+    start: document.getElementById('start-date').value,
+    end: document.getElementById('end-date').value,
+    cash: parseFloat(document.getElementById('cash').value),
+    symbols: document.getElementById('symbols').value,
+    fast: parseInt(document.getElementById('fast').value) || 5,
+    slow: parseInt(document.getElementById('slow').value) || 20,
+    benchmarks: benchmarks
+  };
+
+  fetch('/api/backtest', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(data => {
+    document.getElementById('loading').classList.remove('active');
+    document.getElementById('results').classList.add('active');
+    document.getElementById('run-btn').disabled = false;
+    renderResults(data);
+  })
+  .catch(err => {
+    document.getElementById('loading').classList.remove('active');
+    document.getElementById('run-btn').disabled = false;
+    showError('回测失败: ' + err.message);
+  });
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function renderResults(data) {
+  renderMetrics(data);
+  renderEquityChart(data);
+  renderDrawdownChart(data);
+  renderBenchmarkTable(data);
+  renderTradesChart(data);
+}
+
+function renderMetrics(data) {
+  const s = data.summary;
+  const bm = data.benchmark_metrics;
+  const firstBm = bm[Object.keys(bm)[0]] || {};
+
+  const cards = [
+    {label:'策略总收益', value: s.total_return_pct + '%', cls: s.total_return_pct >= 0 ? 'positive' : 'negative'},
+    {label:'年化收益', value: s.annualized_return_pct + '%', cls: s.annualized_return_pct >= 0 ? 'positive' : 'negative'},
+    {label:'年化波动率', value: s.annualized_volatility_pct + '%'},
+    {label:'Sharpe比率', value: s.sharpe_ratio},
+    {label:'最大回撤', value: s.max_drawdown_pct + '%', cls: 'negative'},
+    {label:'Calmar比率', value: s.calmar_ratio},
+    {label:'超额收益(vs '+(firstBm.name||'基准')+')', value: (firstBm.excess_return_pct||0) + '%', cls: (firstBm.excess_return_pct||0) >= 0 ? 'positive' : 'negative'},
+    {label:'信息比率', value: firstBm.information_ratio||0},
+    {label:'胜率', value: s.win_rate_pct + '%'},
+    {label:'盈亏比', value: s.avg_win_loss_ratio},
+    {label:'交易次数', value: s.num_trades},
+  ];
+
+  document.getElementById('metrics-container').innerHTML = cards.map(c =>
+    `<div class="metric-card"><div class="label">${c.label}</div><div class="value ${c.cls||''}">${c.value}</div></div>`
+  ).join('');
+}
+
+function renderEquityChart(data) {
+  const chart = echarts.init(document.getElementById('chart-equity'));
+  const series = [];
+  const legend = [];
+
+  // Strategy line
+  const stratData = data.equity_curve.map((p, i) => [
+    p.time, data.equity_curve[i].equity / data.equity_curve[0].equity
+  ]);
+  series.push({ name: '策略', type: 'line', data: stratData, smooth: true,
+    lineStyle: { width: 2 }, itemStyle: { color: COLORS[0] } });
+  legend.push('策略');
+
+  // Benchmark lines
+  let ci = 1;
+  for (const [key, bm] of Object.entries(data.benchmarks)) {
+    if (!bm.data || bm.data.length === 0) continue;
+    const firstClose = bm.data[0].close;
+    const bmData = bm.data.map(d => [d.date, d.close / firstClose]);
+    series.push({ name: bm.name, type: 'line', data: bmData, smooth: true,
+      lineStyle: { width: 1, type: 'dashed' }, itemStyle: { color: COLORS[ci % COLORS.length] } });
+    legend.push(bm.name);
+    ci++;
+  }
+
+  chart.setOption({
+    tooltip: { trigger: 'axis', formatter: p => {
+      let html = '<b>' + p[0].axisValue + '</b><br/>';
+      p.forEach(s => { html += `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${s.color};margin-right:4px"></span>${s.seriesName}: ${(s.data[1] * 100 - 100).toFixed(2)}%<br/>`; });
+      return html;
+    }},
+    legend: { data: legend, bottom: 0 },
+    grid: { left: 50, right: 30, top: 20, bottom: 40 },
+    xAxis: { type: 'time', axisLabel: { formatter: '{yyyy}-{MM}' } },
+    yAxis: { type: 'value', axisLabel: { formatter: v => ((v-1)*100).toFixed(0) + '%' } },
+    series: series
+  });
+}
+
+function renderDrawdownChart(data) {
+  const chart = echarts.init(document.getElementById('chart-drawdown'));
+  const times = data.equity_curve.map(p => p.time);
+  const equity = data.equity_curve.map(p => p.equity / data.equity_curve[0].equity);
+  let peak = -Infinity;
+  const dd = equity.map(v => {
+    peak = Math.max(peak, v);
+    return ((v - peak) / peak * 100).toFixed(2);
+  });
+
+  chart.setOption({
+    tooltip: { trigger: 'axis', formatter: p => p[0].axisValue + '<br/>回撤: <b>' + p[0].data[1] + '%</b>' },
+    grid: { left: 50, right: 30, top: 10, bottom: 30 },
+    xAxis: { type: 'category', data: times, axisLabel: { formatter: v => v.slice(0,7) }, show: false },
+    yAxis: { type: 'value', axisLabel: { formatter: v => v + '%' }, inverse: true },
+    series: [{
+      name: '回撤', type: 'line', data: dd.map((v,i) => [times[i], parseFloat(v)]),
+      areaStyle: { color: 'rgba(214,39,40,0.3)' },
+      lineStyle: { color: '#d63031', width: 1 },
+      itemStyle: { color: '#d63031' },
+      smooth: true
+    }]
+  });
+}
+
+function renderBenchmarkTable(data) {
+  const bm = data.benchmark_metrics;
+  if (!bm || Object.keys(bm).length === 0) return;
+
+  let html = '<table class="benchmark-table"><thead><tr>';
+  html += '<th>基准指数</th><th>指数收益</th><th>超额收益</th><th>年化超额</th><th>信息比率</th><th>跟踪误差</th>';
+  html += '</tr></thead><tbody>';
+
+  for (const [key, m] of Object.entries(bm)) {
+    const exCls = m.excess_return_pct >= 0 ? 'positive' : 'negative';
+    html += '<tr>';
+    html += `<td><strong>${m.name}</strong></td>`;
+    html += `<td>${m.benchmark_return_pct}%</td>`;
+    html += `<td class="${exCls}">${m.excess_return_pct}%</td>`;
+    html += `<td>${m.annualized_excess_pct}%</td>`;
+    html += `<td>${m.information_ratio}</td>`;
+    html += `<td>${m.tracking_error_pct}%</td>`;
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  document.getElementById('benchmark-comparison').innerHTML = html;
+}
+
+function renderTradesChart(data) {
+  const chart = echarts.init(document.getElementById('chart-trades'));
+  if (!data.trades || data.trades.length === 0) {
+    chart.setOption({ title: { text: '无卖出交易', left: 'center', top: 'center', textStyle: { color: '#999', fontSize: 14 } } });
+    return;
+  }
+  const pnl = data.trades.map(t => t.pnl);
+  const times = data.trades.map(t => t.time + ' ' + t.symbol);
+  chart.setOption({
+    tooltip: { trigger: 'axis', formatter: p => p[0].name + '<br/>P&L: <b>' + p[0].data + ' ¥</b>' },
+    grid: { left: 60, right: 20, top: 20, bottom: 50 },
+    xAxis: { type: 'category', data: times, axisLabel: { rotate: 45, fontSize: 10 } },
+    yAxis: { type: 'value', axisLabel: { formatter: v => '¥' + v } },
+    series: [{
+      type: 'bar', data: pnl,
+      itemStyle: { color: params => params.data >= 0 ? '#00b894' : '#d63031' }
+    }]
+  });
+}
+
+// Handle strategy change — show/hide MA params
+document.getElementById('strategy').addEventListener('change', function() {
+  document.getElementById('ma-params').style.display = this.value === 'ma_crossover' ? '' : 'none';
+});
+
+// Resize charts on window resize
+window.addEventListener('resize', function() {
+  ['chart-equity', 'chart-drawdown', 'chart-trades'].forEach(id => {
+    const dom = document.getElementById(id);
+    if (dom) { const inst = echarts.getInstanceByDom(dom); if (inst) inst.resize(); }
+  });
+});
+</script>
+</body>
+</html>

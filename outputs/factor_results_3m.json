@@ -1,0 +1,498 @@
+[
+  {
+    "factor_name": "动量_20日",
+    "description": "做多动量最强",
+    "direction": "long",
+    "total_return_pct": -2.14,
+    "annualized_return_pct": -8.69,
+    "sharpe_ratio": -1.073,
+    "max_drawdown_pct": -5.49,
+    "calmar_ratio": -1.583,
+    "win_rate_pct": 50.0,
+    "num_trades": 10,
+    "benchmarks": {
+      "sh": {
+        "name": "上证指数",
+        "benchmark_return_pct": -0.11,
+        "excess_return_pct": -2.03,
+        "information_ratio": -0.736
+      },
+      "hs300": {
+        "name": "沪深300",
+        "benchmark_return_pct": 2.92,
+        "excess_return_pct": -5.06,
+        "information_ratio": -1.526
+      },
+      "sz50": {
+        "name": "上证50",
+        "benchmark_return_pct": -3.87,
+        "excess_return_pct": 1.73,
+        "information_ratio": 0.61
+      },
+      "zz500": {
+        "name": "中证500",
+        "benchmark_return_pct": -18.18,
+        "excess_return_pct": 16.04,
+        "information_ratio": 1.598
+      },
+      "zz1000": {
+        "name": "中证1000",
+        "benchmark_return_pct": 4.73,
+        "excess_return_pct": -6.88,
+        "information_ratio": -1.322
+      },
+      "cyb": {
+        "name": "创业板指",
+        "benchmark_return_pct": 19.05,
+        "excess_return_pct": -21.19,
+        "information_ratio": -3.038
+      },
+      "kc50": {
+        "name": "科创50",
+        "benchmark_return_pct": 22.29,
+        "excess_return_pct": -24.44,
+        "information_ratio": -2.858
+      },
+      "szcz": {
+        "name": "深证成指",
+        "benchmark_return_pct": 9.14,
+        "excess_return_pct": -11.28,
+        "information_ratio": -2.21
+      }
+    }
+  },
+  {
+    "factor_name": "量比_20日",
+    "description": "做多放量",
+    "direction": "long",
+    "total_return_pct": -1.28,
+    "annualized_return_pct": -5.27,
+    "sharpe_ratio": -0.787,
+    "max_drawdown_pct": -4.66,
+    "calmar_ratio": -1.131,
+    "win_rate_pct": 41.67,
+    "num_trades": 12,
+    "benchmarks": {
+      "sh": {
+        "name": "上证指数",
+        "benchmark_return_pct": -0.11,
+        "excess_return_pct": -1.17,
+        "information_ratio": -0.42
+      },
+      "hs300": {
+        "name": "沪深300",
+        "benchmark_return_pct": 2.92,
+        "excess_return_pct": -4.2,
+        "information_ratio": -1.202
+      },
+      "sz50": {
+        "name": "上证50",
+        "benchmark_return_pct": -3.87,
+        "excess_return_pct": 2.59,
+        "information_ratio": 0.866
+      },
+      "zz500": {
+        "name": "中证500",
+        "benchmark_return_pct": -18.18,
+        "excess_return_pct": 16.9,
+        "information_ratio": 1.659
+      },
+      "zz1000": {
+        "name": "中证1000",
+        "benchmark_return_pct": 4.73,
+        "excess_return_pct": -6.02,
+        "information_ratio": -1.124
+      },
+      "cyb": {
+        "name": "创业板指",
+        "benchmark_return_pct": 19.05,
+        "excess_return_pct": -20.33,
+        "information_ratio": -2.825
+      },
+      "kc50": {
+        "name": "科创50",
+        "benchmark_return_pct": 22.29,
+        "excess_return_pct": -23.58,
+        "information_ratio": -2.668
+      },
+      "szcz": {
+        "name": "深证成指",
+        "benchmark_return_pct": 9.14,
+        "excess_return_pct": -10.42,
+        "information_ratio": -1.954
+      }
+    }
+  },
+  {
+    "factor_name": "RSI_14",
+    "description": "做多RSI高",
+    "direction": "long",
+    "total_return_pct": -3.17,
+    "annualized_return_pct": -12.66,
+    "sharpe_ratio": -2.414,
+    "max_drawdown_pct": -4.65,
+    "calmar_ratio": -2.723,
+    "win_rate_pct": 28.57,
+    "num_trades": 14,
+    "benchmarks": {
+      "sh": {
+        "name": "上证指数",
+        "benchmark_return_pct": -0.11,
+        "excess_return_pct": -3.06,
+        "information_ratio": -1.092
+      },
+      "hs300": {
+        "name": "沪深300",
+        "benchmark_return_pct": 2.92,
+        "excess_return_pct": -6.09,
+        "information_ratio": -1.857
+      },
+      "sz50": {
+        "name": "上证50",
+        "benchmark_return_pct": -3.87,
+        "excess_return_pct": 0.7,
+        "information_ratio": 0.186
+      },
+      "zz500": {
+        "name": "中证500",
+        "benchmark_return_pct": -18.18,
+        "excess_return_pct": 15.01,
+        "information_ratio": 1.43
+      },
+      "zz1000": {
+        "name": "中证1000",
+        "benchmark_return_pct": 4.73,
+        "excess_return_pct": -7.91,
+        "information_ratio": -1.505
+      },
+      "cyb": {
+        "name": "创业板指",
+        "benchmark_return_pct": 19.05,
+        "excess_return_pct": -22.22,
+        "information_ratio": -3.287
+      },
+      "kc50": {
+        "name": "科创50",
+        "benchmark_return_pct": 22.29,
+        "excess_return_pct": -25.47,
+        "information_ratio": -2.969
+      },
+      "szcz": {
+        "name": "深证成指",
+        "benchmark_return_pct": 9.14,
+        "excess_return_pct": -12.31,
+        "information_ratio": -2.432
+      }
+    }
+  },
+  {
+    "factor_name": "波动率_20日",
+    "description": "做多低波动",
+    "direction": "short_low",
+    "total_return_pct": -1.08,
+    "annualized_return_pct": -4.48,
+    "sharpe_ratio": -0.673,
+    "max_drawdown_pct": -4.47,
+    "calmar_ratio": -1.002,
+    "win_rate_pct": 71.43,
+    "num_trades": 7,
+    "benchmarks": {
+      "sh": {
+        "name": "上证指数",
+        "benchmark_return_pct": -0.11,
+        "excess_return_pct": -0.98,
+        "information_ratio": -0.331
+      },
+      "hs300": {
+        "name": "沪深300",
+        "benchmark_return_pct": 2.92,
+        "excess_return_pct": -4.01,
+        "information_ratio": -1.06
+      },
+      "sz50": {
+        "name": "上证50",
+        "benchmark_return_pct": -3.87,
+        "excess_return_pct": 2.79,
+        "information_ratio": 0.826
+      },
+      "zz500": {
+        "name": "中证500",
+        "benchmark_return_pct": -18.18,
+        "excess_return_pct": 17.09,
+        "information_ratio": 1.675
+      },
+      "zz1000": {
+        "name": "中证1000",
+        "benchmark_return_pct": 4.73,
+        "excess_return_pct": -5.82,
+        "information_ratio": -1.046
+      },
+      "cyb": {
+        "name": "创业板指",
+        "benchmark_return_pct": 19.05,
+        "excess_return_pct": -20.14,
+        "information_ratio": -2.707
+      },
+      "kc50": {
+        "name": "科创50",
+        "benchmark_return_pct": 22.29,
+        "excess_return_pct": -23.38,
+        "information_ratio": -2.536
+      },
+      "szcz": {
+        "name": "深证成指",
+        "benchmark_return_pct": 9.14,
+        "excess_return_pct": -10.22,
+        "information_ratio": -1.821
+      }
+    }
+  },
+  {
+    "factor_name": "均线偏离_20日",
+    "description": "做多偏离均线上方",
+    "direction": "long",
+    "total_return_pct": 0.45,
+    "annualized_return_pct": 1.92,
+    "sharpe_ratio": 0.037,
+    "max_drawdown_pct": -3.21,
+    "calmar_ratio": 0.598,
+    "win_rate_pct": 42.86,
+    "num_trades": 7,
+    "benchmarks": {
+      "sh": {
+        "name": "上证指数",
+        "benchmark_return_pct": -0.11,
+        "excess_return_pct": 0.56,
+        "information_ratio": 0.124
+      },
+      "hs300": {
+        "name": "沪深300",
+        "benchmark_return_pct": 2.92,
+        "excess_return_pct": -2.47,
+        "information_ratio": -0.763
+      },
+      "sz50": {
+        "name": "上证50",
+        "benchmark_return_pct": -3.87,
+        "excess_return_pct": 4.33,
+        "information_ratio": 1.569
+      },
+      "zz500": {
+        "name": "中证500",
+        "benchmark_return_pct": -18.18,
+        "excess_return_pct": 18.63,
+        "information_ratio": 1.857
+      },
+      "zz1000": {
+        "name": "中证1000",
+        "benchmark_return_pct": 4.73,
+        "excess_return_pct": -4.28,
+        "information_ratio": -0.855
+      },
+      "cyb": {
+        "name": "创业板指",
+        "benchmark_return_pct": 19.05,
+        "excess_return_pct": -18.6,
+        "information_ratio": -2.629
+      },
+      "kc50": {
+        "name": "科创50",
+        "benchmark_return_pct": 22.29,
+        "excess_return_pct": -21.84,
+        "information_ratio": -2.505
+      },
+      "szcz": {
+        "name": "深证成指",
+        "benchmark_return_pct": 9.14,
+        "excess_return_pct": -8.68,
+        "information_ratio": -1.68
+      }
+    }
+  },
+  {
+    "factor_name": "价格位置_20日",
+    "description": "做多高位",
+    "direction": "long",
+    "total_return_pct": 0.25,
+    "annualized_return_pct": 1.05,
+    "sharpe_ratio": -0.056,
+    "max_drawdown_pct": -3.26,
+    "calmar_ratio": 0.32,
+    "win_rate_pct": 33.33,
+    "num_trades": 9,
+    "benchmarks": {
+      "sh": {
+        "name": "上证指数",
+        "benchmark_return_pct": -0.11,
+        "excess_return_pct": 0.36,
+        "information_ratio": 0.055
+      },
+      "hs300": {
+        "name": "沪深300",
+        "benchmark_return_pct": 2.92,
+        "excess_return_pct": -2.67,
+        "information_ratio": -0.816
+      },
+      "sz50": {
+        "name": "上证50",
+        "benchmark_return_pct": -3.87,
+        "excess_return_pct": 4.12,
+        "information_ratio": 1.477
+      },
+      "zz500": {
+        "name": "中证500",
+        "benchmark_return_pct": -18.18,
+        "excess_return_pct": 18.43,
+        "information_ratio": 1.837
+      },
+      "zz1000": {
+        "name": "中证1000",
+        "benchmark_return_pct": 4.73,
+        "excess_return_pct": -4.49,
+        "information_ratio": -0.884
+      },
+      "cyb": {
+        "name": "创业板指",
+        "benchmark_return_pct": 19.05,
+        "excess_return_pct": -18.8,
+        "information_ratio": -2.648
+      },
+      "kc50": {
+        "name": "科创50",
+        "benchmark_return_pct": 22.29,
+        "excess_return_pct": -22.05,
+        "information_ratio": -2.511
+      },
+      "szcz": {
+        "name": "深证成指",
+        "benchmark_return_pct": 9.14,
+        "excess_return_pct": -8.89,
+        "information_ratio": -1.71
+      }
+    }
+  },
+  {
+    "factor_name": "振幅_20日",
+    "description": "做多低振幅",
+    "direction": "short_low",
+    "total_return_pct": 2.76,
+    "annualized_return_pct": 12.13,
+    "sharpe_ratio": 1.016,
+    "max_drawdown_pct": -2.88,
+    "calmar_ratio": 4.21,
+    "win_rate_pct": 83.33,
+    "num_trades": 6,
+    "benchmarks": {
+      "sh": {
+        "name": "上证指数",
+        "benchmark_return_pct": -0.11,
+        "excess_return_pct": 2.87,
+        "information_ratio": 0.811
+      },
+      "hs300": {
+        "name": "沪深300",
+        "benchmark_return_pct": 2.92,
+        "excess_return_pct": -0.16,
+        "information_ratio": -0.105
+      },
+      "sz50": {
+        "name": "上证50",
+        "benchmark_return_pct": -3.87,
+        "excess_return_pct": 6.64,
+        "information_ratio": 2.23
+      },
+      "zz500": {
+        "name": "中证500",
+        "benchmark_return_pct": -18.18,
+        "excess_return_pct": 20.94,
+        "information_ratio": 2.08
+      },
+      "zz1000": {
+        "name": "中证1000",
+        "benchmark_return_pct": 4.73,
+        "excess_return_pct": -1.97,
+        "information_ratio": -0.444
+      },
+      "cyb": {
+        "name": "创业板指",
+        "benchmark_return_pct": 19.05,
+        "excess_return_pct": -16.29,
+        "information_ratio": -2.257
+      },
+      "kc50": {
+        "name": "科创50",
+        "benchmark_return_pct": 22.29,
+        "excess_return_pct": -19.53,
+        "information_ratio": -2.174
+      },
+      "szcz": {
+        "name": "深证成指",
+        "benchmark_return_pct": 9.14,
+        "excess_return_pct": -6.37,
+        "information_ratio": -1.219
+      }
+    }
+  },
+  {
+    "factor_name": "成交额_20日",
+    "description": "做多高成交额",
+    "direction": "long",
+    "total_return_pct": -4.91,
+    "annualized_return_pct": -19.08,
+    "sharpe_ratio": -2.06,
+    "max_drawdown_pct": -8.17,
+    "calmar_ratio": -2.335,
+    "win_rate_pct": 100.0,
+    "num_trades": 4,
+    "benchmarks": {
+      "sh": {
+        "name": "上证指数",
+        "benchmark_return_pct": -0.11,
+        "excess_return_pct": -4.8,
+        "information_ratio": -1.48
+      },
+      "hs300": {
+        "name": "沪深300",
+        "benchmark_return_pct": 2.92,
+        "excess_return_pct": -7.84,
+        "information_ratio": -2.205
+      },
+      "sz50": {
+        "name": "上证50",
+        "benchmark_return_pct": -3.87,
+        "excess_return_pct": -1.04,
+        "information_ratio": -0.407
+      },
+      "zz500": {
+        "name": "中证500",
+        "benchmark_return_pct": -18.18,
+        "excess_return_pct": 13.26,
+        "information_ratio": 1.29
+      },
+      "zz1000": {
+        "name": "中证1000",
+        "benchmark_return_pct": 4.73,
+        "excess_return_pct": -9.65,
+        "information_ratio": -1.731
+      },
+      "cyb": {
+        "name": "创业板指",
+        "benchmark_return_pct": 19.05,
+        "excess_return_pct": -23.96,
+        "information_ratio": -3.431
+      },
+      "kc50": {
+        "name": "科创50",
+        "benchmark_return_pct": 22.29,
+        "excess_return_pct": -27.21,
+        "information_ratio": -3.047
+      },
+      "szcz": {
+        "name": "深证成指",
+        "benchmark_return_pct": 9.14,
+        "excess_return_pct": -14.05,
+        "information_ratio": -2.674
+      }
+    }
+  }
+]
