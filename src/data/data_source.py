@@ -13,6 +13,9 @@ class DataSource(ABC):
     def load_symbol(self, symbol: str, start: date, end: date) -> pd.DataFrame:
         ...
 
+    def load_fundamentals(self, symbol: str, start: date, end: date) -> pd.DataFrame:
+        return pd.DataFrame()
+
 
 class AkShareDataSource(DataSource):
     COLUMN_MAP = {
@@ -71,6 +74,8 @@ class AkShareDataSource(DataSource):
 
 
 class BaostockDataSource(DataSource):
+    FUND_FIELDS = ["peTTM", "pbMRQ", "turn"]
+
     def __init__(self, cache_dir: str = "data/cache"):
         self.cache = CacheManager(cache_dir)
 
@@ -86,19 +91,37 @@ class BaostockDataSource(DataSource):
         self.cache.write(symbol, df)
         return df
 
+    def load_fundamentals(self, symbol: str, start: date, end: date) -> pd.DataFrame:
+        """Load OHLCV + PE/PB/turnover data. Uses a separate cache key."""
+        cache_key = f"{symbol}__fund"
+        df = self.cache.read(cache_key)
+        if df is not None and self._covers(df, start, end):
+            logger.debug(f"Cache hit: {cache_key}")
+            return self._slice(df, start, end)
+
+        logger.info(f"Fetching fundamentals {symbol} from Baostock: {start} ~ {end}")
+        df = self._fetch(symbol, start, end, include_fund=True)
+        df = self._clean(df, symbol, include_fund=True)
+        self.cache.write(cache_key, df)
+        return df
+
     def _to_baostock_symbol(self, symbol: str) -> str:
         code, market = symbol.split(".")
         prefix = "sh" if market == "SH" else "sz"
         return f"{prefix}.{code}"
 
-    def _fetch(self, symbol: str, start: date, end: date) -> pd.DataFrame:
+    def _fetch(self, symbol: str, start: date, end: date, include_fund: bool = False) -> pd.DataFrame:
         import baostock as bs
 
         bs.login()
         bs_code = self._to_baostock_symbol(symbol)
+        if include_fund:
+            fields = "date,open,high,low,close,volume,amount,preclose,peTTM,pbMRQ,turn"
+        else:
+            fields = "date,open,high,low,close,volume,amount,preclose"
         rs = bs.query_history_k_data_plus(
             bs_code,
-            "date,open,high,low,close,volume,amount,preclose",
+            fields,
             start_date=start.strftime("%Y-%m-%d"),
             end_date=end.strftime("%Y-%m-%d"),
             frequency="d",
@@ -110,12 +133,17 @@ class BaostockDataSource(DataSource):
             rows.append(rs.get_row_data())
         bs.logout()
 
-        return pd.DataFrame(rows, columns=["date", "open", "high", "low", "close", "volume", "amount", "preclose"])
+        cols = fields.split(",")
+        return pd.DataFrame(rows, columns=cols)
 
-    def _clean(self, raw: pd.DataFrame, symbol: str) -> pd.DataFrame:
+    def _clean(self, raw: pd.DataFrame, symbol: str, include_fund: bool = False) -> pd.DataFrame:
         df = raw.copy()
-        for col in ["open", "high", "low", "close", "volume", "amount", "preclose"]:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
+        num_cols = ["open", "high", "low", "close", "volume", "amount", "preclose"]
+        if include_fund:
+            num_cols += self.FUND_FIELDS
+        for col in num_cols:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
 
         df["date"] = pd.to_datetime(df["date"])
         df = df.sort_values("date").set_index("date")
@@ -124,6 +152,8 @@ class BaostockDataSource(DataSource):
         df["symbol"] = symbol
 
         keep_cols = ["symbol", "open", "high", "low", "close", "volume", "amount", "prev_close"]
+        if include_fund:
+            keep_cols += self.FUND_FIELDS
         return df[keep_cols]
 
     def _covers(self, df: pd.DataFrame, start: date, end: date) -> bool:

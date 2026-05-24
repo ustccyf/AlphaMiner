@@ -67,7 +67,7 @@ class PerformanceAnalyzer:
             return 0.0
         diff = self._benchmark["returns"] - self._benchmark["bm_return"]
         std_diff = diff.std()
-        if std_diff == 0:
+        if std_diff < 1e-12:
             return 0.0
         return float(np.sqrt(self.trading_days) * diff.mean() / std_diff)
 
@@ -121,15 +121,18 @@ class PerformanceAnalyzer:
     def sharpe_ratio(self, risk_free: float = 0.02) -> float:
         if len(self.equity) < 2:
             return 0.0
-        excess = self.equity["returns"] - risk_free / self.trading_days
+        returns = self.equity["returns"]
+        if returns.std() < 1e-12:
+            return 0.0
+        excess = returns - risk_free / self.trading_days
         std_excess = excess.std()
-        if std_excess == 0:
+        if std_excess < 1e-12:
             return 0.0
         return float(np.sqrt(self.trading_days) * excess.mean() / std_excess)
 
     def calmar_ratio(self) -> float:
         mdd = self.max_drawdown()
-        if mdd == 0:
+        if abs(mdd) < 1e-12:
             return 0.0
         return self.annualized_return() / abs(mdd)
 
